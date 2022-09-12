@@ -1,0 +1,657 @@
+<div class="cajaprocs">
+                                    
+                                    <div class="producs">
+
+                                        <img style="border-radius: 20px; height: 5rem; width: 5rem;" src="../img/<?php echo $values['item_img']; ?>" alt="">
+                                        
+                                        <h3><?php echo $values["item_nombre"]; ?></h3>
+
+                                        <h3>$<?php echo $values["item_precio"]; ?></h3>
+
+                                        <div class="cant">
+                                            <input type="number" name="item_cantidad" min="1" max="100" value="1"/>
+                                        </div>
+
+                                        <div class="clear">
+                                        <a href="./carrito.php?action=delete&id=<?php echo $values["item_id"]; ?>">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                            </svg>
+                                        </a>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+if (isset($_POST['agregar'])){
+        /// print_r($_POST['product_id']);
+        if(isset($_SESSION['add_carro'])){
+    
+            $item_array_id = array_column($_SESSION['add_carro'], "item_id");
+    
+            if(in_array($_POST['item_id'], $item_array_id)){
+                echo "<script>alert('Product is already added in the cart..!')</script>";
+                echo "<script>window.location = 'cate1.php'</script>";
+            }else{
+    
+                $count = count($_SESSION['add_carro']);
+                $item_array = array(
+                    'item_id' => $_POST['item_id'],
+                    'item_nombre' => $_POST['item_nombre'],
+                    'item_precio' => $_POST['item_precio'],
+                    'item_img' => $_POST['item_img']
+                );
+    
+                $_SESSION['add_carro'][$count] = $item_array;
+            }
+    
+        }else{
+    
+            $item_array = array(
+                'item_id' => $_POST['item_id'],
+                'item_nombre' => $_POST['item_nombre'],
+                'item_precio' => $_POST['item_precio'],
+                'item_img' => $_POST['item_img']
+            );
+    
+            // Create new session variable
+            $_SESSION['add_carro'][0] = $item_array;
+        }
+    }
+
+
+<div class="pagr">
+                        <!--Formulario de compra-->
+                        <h2>Formulario de pago</h2>
+                        <form id="formulario-pago" action="../php/recibo.php" method="POST">
+                                <div class="nombre">
+                                    <label class="label">Nombre Apellido</label>
+                                    <input type="text" name="nombreapellido" id="nombreapellido" placeholder="Juan Manuel" required>
+
+                                    <label class="label">DUI</label>
+                                    <input type="text" name="dui" id="dui" placeholder="0000000-0" required>
+                                </div>
+                                <div class="numerotar">
+                                    <label class="label">Método de pago</label>
+                                    <select name="metod" id="metod" required>
+                                        <option value="Efectivo">Efectivo</option>
+                                        <option value="Otro" >Otro</option>
+                                        <option value="Elegir" selected>Elegir una opción</option>
+                                    </select>
+                                </div>
+                                <div class="fechas">
+                                <div class="vence">
+                                    <label class="label">Teléfono</label>
+                                    <input type="tel" name="phone" id="phone" placeholder="0000-0000" required>
+                                </div>
+                                <div class="cvc">
+                                    <label class="label">Total</label>
+                                    <div class="total">$ <?php echo number_format($total, 2); ?></div>
+                                </div>
+                                </div>
+                                <!--link a página de compra realizada-->
+                                <div id="btnen">
+                                    <input class="btn2 vermas2" type="submit" value="Realizar Pago">
+                                </div>
+                            </form>
+                            <a style="color: #E6FFEB;" href="../paginas/404.html">Términos y condiciones</a>
+                    </div>
+
+                    <?php 
+
+                        function cartElement($item_img, $item_nombre, $item_precio, $item_id){
+                            $element = "
+                            
+                            <form action=\"cart.php?action=remove&id=$item_id\" method=\"post\" class=\"cart-items\">
+                            
+                            <div class=\"cajaprocs\">
+                                    
+                                    <div class=\"producs\">
+
+                                        <img style=\"border-radius: 20px; height: 5rem; width: 5rem;\" src=\"../img/$item_img\">
+                                        
+                                        <h3>$item_nombre</h3>
+
+                                        <h3>$$item_precio</h3>
+
+                                        <div class=\"cant\">
+                                            <input type=\"number\" name=\"item_cantidad\" min=\"1\" max=\"100\" value=\"1\"/>
+                                        </div>
+
+                                        <div class=\"clear\">
+                                        <button type=\"submit\" class=\"clbtn\" name=\"remove\">Remove</button>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            
+                            </form>
+                            
+                            ";
+                            echo  $element;
+                        }
+                    
+                    ?>
+
+<?php
+
+    session_start();
+
+    include ("../php/config.php");
+
+    if (!isset($_SESSION['usuario'])) {
+        header("Location: ../index.php");
+    }    
+
+    error_reporting(0);
+
+    if (isset($_GET['action'])) {
+        if ($_GET['action'] == 'delete') {
+            foreach ($_SESSION['add_carro'] as $key => $value) {
+                if ($value['item_id'] == $_GET['IDProducto']) {
+                    unset($_SESSION['add_carro'][$key]);
+                    echo '<script>alert("El producto fue eliminado del carrito!");</script>';
+                    echo '<script>window.location="carrito.php";</script>';
+                }
+            }
+        }
+    }
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" contents="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../css/carrito.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../css/carrito.css?v=<?php echo(rand()); ?>" />
+    <title>Carrito de compras</title>
+    <link rel="icon" href="../img/dogoo.svg">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="../js/jquery.nice-number.css">
+    <link rel="stylesheet" href="../js/jquery.nice-number.css?v=<?php echo(rand()); ?>" />
+</head>
+<body>
+
+    <header>
+        <div>
+            <a href="../paginas/inicio.html"><img src="../img/dogoo.svg" alt=""></a>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../paginas/categorias.php">Categorías</a></li>
+                <li><a href="../paginas/nosotros.html">Nosotros</a></li>
+                <li><a href="../paginas/contactanos.php">Contáctanos</a></li>
+            </ul>
+      </nav>
+      
+        <div class="rbox" style="display: flex;">
+            <div class="logout" style="display: flex; align-items: center; justify-content: center; margin-right: 3rem;">
+                <?php echo "<h2>" . $_SESSION['usuario'] . "</h2>"; ?>
+
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="mr-auto"></div>
+                    <div class="navbar-nav">
+                        <a href="../php/carrito.php" class="nav-item nav-link active">
+                            <h5 class="px-5 cart">
+                                <i class="fas fa-shopping-cart"></i> Cart
+                                <?php
+
+                                if (isset($_SESSION['add_carro'])){
+                                    $count = count($_SESSION['add_carro']);
+                                    echo "<span id='cart_count' class=''>$count</span>";
+                                }else{
+                                    echo "<span id='cart_count' class=''>0</span>";
+                                }
+
+                                ?>
+                            </h5>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+
+            <div class="upbtns" style="width: auto; justify-content: center;">
+                <a href="./logout.php" style="text-decoration: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                    <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                </svg>
+                </a>
+            </div>
+        </div> 
+
+    </header>
+
+    <main>
+
+        <section class="cart">
+
+            <h1>Carrito de compras</h1>
+
+            <div class="pago">
+
+                <div class="payment">
+                    
+                    <h2 style="margin-bottom: 1rem;">Realiza tu pago</h2>
+
+                    <?php
+
+                        if (!empty($_SESSION["add_carro"])) {
+                            $total = 0;
+                            foreach ($_SESSION["add_carro"] as $keys => $values) {
+                    ?>
+
+                                <div class="cajaprocs">
+                                    
+                                    <div class="producs">
+
+                                        <img style="border-radius: 20px; height: 5rem; width: 5rem;" src="../img/<?php echo $values['item_img']; ?>" alt="">
+                                        
+                                        <h3><?php echo $values["item_nombre"]; ?></h3>
+
+                                        <h3>$<?php echo $values["item_precio"]; ?></h3>
+
+                                        <div class="cant">
+                                            <input type="number" name="item_cantidad" min="1" max="100" value="1"/>
+                                        </div>
+
+                                        <div class="clear">
+                                            <a href="carrito.php?action=delete&id=<?php echo $values["item_id"]; ?>">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                                <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+                                                </svg>
+                                            </a>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                        <?php
+                            $total = $total + ($values["item_cantidad"] * $values["item_precio"]);
+                            $_SESSION['total'] = $total;
+                        }
+                        ?>
+                            
+                    <?php
+                    } else {
+                    ?>
+                        <tr class="lol">
+                            <td colspan="6" style="color: red; text-align: center;"><strong>¡No hay ningun producto agregado!</strong></td>
+                        </tr>
+                    <?php
+                    }
+                    ?>
+
+                </div>
+
+                    <div class="pagr">
+                        <!--Formulario de compra-->
+                        <h2>Formulario de pago</h2>
+                        <form id="formulario-pago" action="../php/recibo.php" method="POST">
+                                <div class="nombre">
+                                    <label class="label">Nombre Apellido</label>
+                                    <input type="text" name="nombreapellido" id="nombreapellido" placeholder="Juan Manuel" required>
+
+                                    <label class="label">DUI</label>
+                                    <input type="text" name="dui" id="dui" placeholder="0000000-0" required>
+                                </div>
+                                <div class="numerotar">
+                                    <label class="label">Método de pago</label>
+                                    <select name="metod" id="metod" required>
+                                        <option value="Efectivo">Efectivo</option>
+                                        <option value="Otro" >Otro</option>
+                                        <option value="Elegir" selected>Elegir una opción</option>
+                                    </select>
+                                </div>
+                                <div class="fechas">
+                                <div class="vence">
+                                    <label class="label">Teléfono</label>
+                                    <input type="tel" name="phone" id="phone" placeholder="0000-0000" required>
+                                </div>
+                                <div class="cvc">
+                                    <label class="label">Total</label>
+                                    <div class="total">$ <?php echo number_format($total, 2); ?></div>
+                                </div>
+                                </div>
+                                <!--link a página de compra realizada-->
+                                <div id="btnen">
+                                    <input class="btn2 vermas2" type="submit" value="Realizar Pago">
+                                </div>
+                            </form>
+                            <a style="color: #E6FFEB;" href="../paginas/404.html">Términos y condiciones</a>
+                    </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Copyright &copy; 
+            <script>document.write(new Date().getFullYear());
+            </script>, Natural Pet
+        </p>
+        <!-- #copyright -->
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    
+</body>
+</html>
+
+<?php
+
+                        $total=0;
+
+                        if (!empty($_SESSION["add_carro"])) {
+
+                            foreach ($_SESSION["add_carro"] as $keys => $values) {
+                                
+                                $total=$total+$values["item_precio"];
+                            
+                                echo "
+
+                                <div class='cajaprocs'>
+                                    
+                                    <div class='producs'>
+
+                                        <img style='border-radius: 20px; height: 5rem; width: 5rem;' src='../img/$values[item_img]'>
+                                        
+                                        <h3>$values[item_nombre]</h3>
+
+                                        <h3>$$values[item_precio]</h3>
+
+                                        <div class='cant'>
+                                            <input type='number' name='item_cantidad' min='1' max='100' value='1'/>
+                                        </div>
+
+                                        <div class='clear'>
+                                            <a href='carrito.php?action=delete&id=$values[item_id]'>
+                                                REMOVE
+                                            </a>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            ";
+                            
+                        } 
+                        
+                        } else {
+
+                            echo "
+
+                            <tr class='lol'>
+                                <td colspan='6' style='color: red; text-align: center;'><strong>¡No hay ningun producto agregado!</strong></td>
+                            </tr>
+                            ";
+                        }
+
+                    ?>
+
+<?php
+
+    session_start();
+
+    include ("../php/config.php");
+
+    if (!isset($_SESSION['usuario'])) {
+        header("Location: ../index.php");
+    }    
+
+    error_reporting(0);
+
+
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" contents="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../css/carrito.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="../css/carrito.css?v=<?php echo(rand()); ?>" />
+    <title>Carrito de compras</title>
+    <link rel="icon" href="../img/dogoo.svg">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+    <link rel="stylesheet" href="../js/jquery.nice-number.css">
+    <link rel="stylesheet" href="../js/jquery.nice-number.css?v=<?php echo(rand()); ?>" />
+</head>
+<body>
+
+    <header>
+        <div>
+            <a href="../paginas/inicio.html"><img src="../img/dogoo.svg" alt=""></a>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="../paginas/categorias.php">Categorías</a></li>
+                <li><a href="../paginas/nosotros.html">Nosotros</a></li>
+                <li><a href="../paginas/contactanos.php">Contáctanos</a></li>
+            </ul>
+      </nav>
+      
+        <div class="rbox" style="display: flex;">
+            <div class="logout" style="display: flex; align-items: center; justify-content: center; margin-right: 3rem;">
+                <?php echo "<h2>" . $_SESSION['usuario'] . "</h2>"; ?>
+
+                <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+                    <div class="mr-auto"></div>
+                    <div class="navbar-nav">
+                        <a href="../php/carrito.php" class="nav-item nav-link active">
+                            <h5 class="px-5 cart">
+                                <i class="fas fa-shopping-cart"></i> Cart
+                                <?php
+
+                                if (isset($_SESSION['add_carro'])){
+                                    $count = count($_SESSION['add_carro']);
+                                    echo "<span id='cart_count' class=''>$count</span>";
+                                }else{
+                                    echo "<span id='cart_count' class=''>0</span>";
+                                }
+
+                                ?>
+                            </h5>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            </div>
+
+            <div class="upbtns" style="width: auto; justify-content: center;">
+                <a href="./logout.php" style="text-decoration: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-right" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"/>
+                    <path fill-rule="evenodd" d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/>
+                </svg>
+                </a>
+            </div>
+        </div> 
+
+    </header>
+
+    <main>
+
+        <section class="cart">
+
+            <h1>Carrito de compras</h1>
+
+            <div class="pago">
+
+                <div class="payment">
+                    
+                    <h2 style="margin-bottom: 1rem;">Realiza tu pago</h2>
+
+                    <?php
+
+                        $total=0;
+
+                        if (!empty($_SESSION["add_carro"])) {
+
+                            foreach ($_SESSION["add_carro"] as $keys => $values) {
+                                
+                                $total=$total+$values["item_precio"];
+                            
+                                echo "
+
+                                <div class='cajaprocs'>
+                                    
+                                    <div class='producs'>
+
+                                        <img style='border-radius: 20px; height: 5rem; width: 5rem;' src='../img/$values[item_img]'>
+                                        
+                                        <h3>$values[item_nombre]</h3>
+
+                                        <h3>$$values[item_precio]</h3>
+
+                                        <div class='cant'>
+                                            <input type='number' name='item_cantidad' min='1' max='100' value='1'/>
+                                        </div>
+
+                                        <div class='clear'>
+                                            <a href='#' data-id='$values[item_id]'>
+                                                REMOVE
+                                            </a>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            ";
+                            
+                        } 
+                        
+                    } else {
+
+                        echo "
+                        <tr class='lol'>
+                            <td colspan='6' style='color: red; text-align: center;'><strong>¡No hay ningun producto agregado!</strong></td>
+                        </tr>
+                        ";
+                    }
+
+                    ?>
+
+                </div>
+
+                    <div class="pagr">
+                        <!--Formulario de compra-->
+                        <h2 style="width: max-content;">Detalles de productos</h2>
+                        <form id="formulario-pago" action="../php/recibo.php" method="POST">
+                                <div class="numerotar">
+                                    <label class="label">Método de pago</label>
+                                    <select name="metod" id="metod" required>
+                                        <option value="Efectivo">Efectivo</option>
+                                        <option value="Otro" >Otro</option>
+                                        <option value="Elegir" selected>Elegir una opción</option>
+                                    </select>
+                                </div>
+                                <div class="fechas">
+                                <div class="cvc">
+                                    <label class="label">Productos</label>
+                                    <div class="total"><?php
+                                            if (isset($_SESSION['add_carro'])){
+                                                $count  = count($_SESSION['add_carro']);
+                                                echo "$count items";
+                                            }else{
+                                                echo "0 items";
+                                            }
+                                        ?>
+                                    </div>
+                                </div>
+                                <div class="cvc">
+                                    <label class="label">Total</label>
+                                    <div class="total">$ <?php echo number_format($total, 2); ?></div>
+                                </div>
+                                </div>
+                                <!--link a página de compra realizada-->
+                                <div id="btnen">
+                                    <input class="btn2 vermas2" type="submit" value="Comprar" name="comprar">
+                                </div>
+                            </form>
+                            <a style="color: #E6FFEB;" href="../paginas/404.html">Términos y condiciones</a>
+                    </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Copyright &copy; 
+            <script>document.write(new Date().getFullYear());
+            </script>, Natural Pet
+        </p>
+        <!-- #copyright -->
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+    
+</body>
+</html>
+
+if (isset($_POST['agregar'])) {
+        if (isset($_SESSION['add_carro'])) {
+            $item_array_id_cart = array_column($_SESSION['add_carro'], 'item_id');
+            if (!in_array($_GET['IDProducto'], $item_array_id_cart)) {
+    
+                $count = count($_SESSION['add_carro']);
+                $item_array = array(
+                    'item_id'        => $_GET['IDProducto'],
+                    'item_nombre'    => $_POST['item_nombre'],
+                    'item_precio'    => $_POST['item_precio'],
+                    'item_img'  => $_POST['item_img'],
+                );
+    
+                $_SESSION['add_carro'][$count] = $item_array;
+            } else {
+                echo '<script>alert("El Producto ya existe en el carrito!");</script>';
+            }
+        } else {
+            $item_array = array(
+                'item_id'        => $_GET['IDProducto'],
+                'item_nombre'    => $_POST['item_nombre'],
+                'item_precio'    => $_POST['item_precio'],
+                'item_img'  => $_POST['item_img'],
+            );
+    
+            $_SESSION['add_carro'][0] = $item_array;
+        }
+    }
+
+
+    if (isset($_GET['action'])) {
+        if ($_GET['action'] == 'delete') {
+            foreach ($_SESSION['add_carro'] as $key => $value) {
+                if ($value['item_id'] == $_GET['id']) {
+                    unset($_SESSION['add_carro'][$key]);
+                    echo '<script>alert("El producto fue eliminado del carrito!");</script>';
+                    echo '<script>window.location="carrito.php";</script>';
+                }
+            }
+        }
+    }

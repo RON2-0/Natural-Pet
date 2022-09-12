@@ -1,0 +1,98 @@
+/*Establecimiento de Márgenes*/
+
+*{
+    margin: 0;
+	padding: 0;
+}
+
+/*Roots*/
+
+:root {
+    --color-primary: #ffffff;
+    --color-secondary: #232323;
+    --text-primary: #1f1f1f;
+    --text-secondary: #707070;
+    --bg-greendark: #D4F8DC;
+    --bg-greenlight: #E6FFEB;
+}
+
+/*Selecciones*/
+
+::selection {
+    background: ;
+    color: ;
+}
+
+/*Fuentes Tipográficas*/
+
+@font-face {
+    font-family: '';
+    src: url();
+}
+
+@font-face {
+    font-family: '';
+    src: url();
+}
+
+/* Barra de Scroll */
+  
+body::-webkit-scrollbar {
+    width: 0.45rem;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #7b7465;
+    border-radius: 10px;
+    border-right: 2px solid var(--color-primary);
+}
+
+/*General*/
+
+html{
+    background-color: var(--bg-greenlight);
+}
+
+.bg-error{
+    background-image: url(../svg/error.svg);
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+body{
+    font-family: 'Montserrat';
+}
+
+/*Cuadro principal*/
+
+main{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+main img{
+    height: 80vh;
+    width: auto;
+}
+
+.behi_l{
+    z-index: -1;
+}
+
+.behin_r{
+    z-index: -1;
+}
+
+/*Footer*/
+
+footer{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    letter-spacing: 0.1rem;
+  }
